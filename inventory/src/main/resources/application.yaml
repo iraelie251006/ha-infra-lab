@@ -1,3 +1,47 @@
 spring:
   application:
     name: inventory
+
+  datasource:
+    primary:
+      jdbc-url: jdbc:mariadb://${DB_PRIMARY_HOST:localhost}:3306/${DB_NAME:inventory}
+      username: ${DB_USER:root}
+      password: ${DB_PASSWORD:root}
+      driver-class-name: org.mariadb.jdbc.Driver
+      hikari:
+        pool-name: PrimaryPool
+        maximum-pool-size: 10
+
+    replica:
+      jdbc-url: jdbc:mariadb://${DB_REPLICA_HOST:localhost}:3306/${DB_NAME:inventory}
+      username: ${DB_USER:root}
+      password: ${DB_PASSWORD:root}
+      driver-class-name: org.mariadb.jdbc.Driver
+      hikari:
+        pool-name: ReplicaPool
+        maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+        format_sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+server:
+  port: 8080
